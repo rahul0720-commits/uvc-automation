@@ -1,0 +1,22 @@
+{
+  "name": "uvc-automation",
+  "version": "1.0.0",
+  "description": "Podcast content repurposing automation — transcript to blog, Twitter thread, LinkedIn post",
+  "type": "module",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js"
+  },
+  "author": "Rahul",
+  "license": "MIT",
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.74.0",
+    "better-sqlite3": "^12.6.2",
+    "dotenv": "^17.3.1",
+    "ejs": "^4.0.1",
+    "express": "^5.2.1",
+    "multer": "^2.0.2",
+    "srt-parser-2": "^1.2.3",
+    "twitter-api-v2": "^1.29.0"
+  }
+}

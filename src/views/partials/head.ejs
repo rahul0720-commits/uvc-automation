@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %> - UVC Automation</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+  <style>
+    .htmx-indicator { display: none; }
+    .htmx-request .htmx-indicator { display: inline-block; }
+    .htmx-request.htmx-indicator { display: inline-block; }
+    .tab-btn.active { border-color: #4f46e5; color: #4f46e5; }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+  </style>
+</head>
+<body class="bg-gray-50 text-gray-900 min-h-screen">
+  <nav class="bg-white border-b border-gray-200 px-6 py-4">
+    <div class="max-w-5xl mx-auto flex items-center justify-between">
+      <a href="/" class="text-xl font-bold text-indigo-600">UVC Automation</a>
+      <span class="text-sm text-gray-500">Podcast &rarr; Content &rarr; Publish</span>
+    </div>
+  </nav>
+  <main class="max-w-5xl mx-auto px-6 py-8">
