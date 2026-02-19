@@ -87,13 +87,43 @@ export async function generateLinkedInPost(transcript, metadata) {
 }
 
 /**
+ * Generate YouTube title options and thumbnail text options from transcript
+ * Returns a JSON object with titles[] and thumbnails[]
+ */
+export async function generateYouTubeOptions(transcript, metadata) {
+  const systemPrompt = loadPrompt('youtube-options.txt');
+  const response = await client.messages.create({
+    model: 'claude-sonnet-4-20250514',
+    max_tokens: 2048,
+    system: systemPrompt,
+    messages: [
+      {
+        role: 'user',
+        content: `Episode: "${metadata.title}"${metadata.guestName ? ` with ${metadata.guestName}` : ''}\n\nTranscript:\n${transcript}`,
+      },
+    ],
+  });
+  const text = response.content[0].text;
+  try {
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    if (jsonMatch) {
+      return JSON.parse(jsonMatch[0]);
+    }
+    return { titles: [], thumbnails: [] };
+  } catch {
+    return { titles: [], thumbnails: [], raw: text };
+  }
+}
+
+/**
  * Generate all content in parallel
  */
 export async function generateAllContent(transcript, metadata) {
-  const [blogPost, twitterThread, linkedinPost] = await Promise.all([
+  const [blogPost, twitterThread, linkedinPost, youtubeOptions] = await Promise.all([
     generateBlogPost(transcript, metadata),
     generateTwitterThread(transcript, metadata),
     generateLinkedInPost(transcript, metadata),
+    generateYouTubeOptions(transcript, metadata),
   ]);
 
   // Derive Substack draft from blog post with newsletter formatting
@@ -104,5 +134,6 @@ export async function generateAllContent(transcript, metadata) {
     twitterThread,
     linkedinPost,
     substackDraft,
+    youtubeOptions,
   };
 }

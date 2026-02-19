@@ -24,6 +24,7 @@ router.post('/:id/generate', async (req, res, next) => {
         twitter_thread = ?,
         linkedin_post = ?,
         substack_draft = ?,
+        youtube_options = ?,
         updated_at = datetime('now')
        WHERE id = ?`
     ).run(
@@ -31,6 +32,7 @@ router.post('/:id/generate', async (req, res, next) => {
       JSON.stringify(content.twitterThread),
       content.linkedinPost,
       content.substackDraft,
+      JSON.stringify(content.youtubeOptions),
       req.params.id
     );
 
@@ -64,6 +66,10 @@ router.post('/:id/regenerate/:platform', async (req, res, next) => {
       const { generateLinkedInPost } = await import('../services/claude.js');
       content = await generateLinkedInPost(episode.transcript_clean, metadata);
       column = 'linkedin_post';
+    } else if (platform === 'youtube') {
+      const { generateYouTubeOptions } = await import('../services/claude.js');
+      content = JSON.stringify(await generateYouTubeOptions(episode.transcript_clean, metadata));
+      column = 'youtube_options';
     } else {
       return res.status(400).send('Invalid platform');
     }

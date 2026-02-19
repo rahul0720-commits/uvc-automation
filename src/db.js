@@ -58,4 +58,13 @@ db.exec(`
   );
 `);
 
+// Migration: Add YouTube columns if they don't exist
+const youtubeMigrations = [
+  `ALTER TABLE episodes ADD COLUMN youtube_options TEXT`,
+  `ALTER TABLE episodes ADD COLUMN youtube_approved INTEGER DEFAULT 0`,
+];
+for (const sql of youtubeMigrations) {
+  try { db.exec(sql); } catch (e) { /* Column already exists */ }
+}
+
 export default db;

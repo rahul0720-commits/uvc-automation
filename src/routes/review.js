@@ -19,10 +19,19 @@ router.get('/:id/review', (req, res) => {
     twitterThread = [];
   }
 
+  // Parse YouTube options JSON
+  let youtubeOptions = { titles: [], thumbnails: [] };
+  try {
+    youtubeOptions = episode.youtube_options ? JSON.parse(episode.youtube_options) : { titles: [], thumbnails: [] };
+  } catch {
+    youtubeOptions = { titles: [], thumbnails: [] };
+  }
+
   res.render('review', {
     title: `Review: ${episode.title}`,
     episode,
     twitterThread,
+    youtubeOptions,
     twitterConnected: twitterConnected(),
     linkedinConnected: linkedinConnected(),
     substackUrl: config.substackUrl,
@@ -32,7 +41,7 @@ router.get('/:id/review', (req, res) => {
 // Approve a platform's content
 router.post('/:id/approve/:platform', (req, res) => {
   const { platform } = req.params;
-  const validPlatforms = ['blog', 'twitter', 'linkedin', 'substack'];
+  const validPlatforms = ['blog', 'twitter', 'linkedin', 'substack', 'youtube'];
   if (!validPlatforms.includes(platform)) return res.status(400).send('Invalid platform');
 
   db.prepare(`UPDATE episodes SET ${platform}_approved = 1, updated_at = datetime('now') WHERE id = ?`).run(
@@ -57,6 +66,7 @@ router.post('/:id/edit/:platform', (req, res) => {
     twitter: 'twitter_thread',
     linkedin: 'linkedin_post',
     substack: 'substack_draft',
+    youtube: 'youtube_options',
   };
 
   const column = columnMap[platform];
