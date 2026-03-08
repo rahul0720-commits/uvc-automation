@@ -1,0 +1,92 @@
+<%- include('partials/head', { title: 'Prompts' }) %>
+
+<div class="mb-8">
+  <h1 class="text-3xl font-bold">Prompts</h1>
+  <p class="text-gray-500 mt-1 text-sm">Edit the AI prompts used to generate content. Changes take effect immediately for new generations.</p>
+</div>
+
+<% if (saved) { %>
+  <div class="mb-6 px-4 py-3 bg-green-50 border border-green-200 text-green-800 rounded-lg text-sm">
+    ✓ Prompt saved successfully.
+  </div>
+<% } %>
+<% if (reset) { %>
+  <div class="mb-6 px-4 py-3 bg-blue-50 border border-blue-200 text-blue-800 rounded-lg text-sm">
+    ↺ Prompt reset to default.
+  </div>
+<% } %>
+
+<!-- Tabs -->
+<div class="flex gap-1 mb-6 border-b border-gray-200">
+  <% prompts.forEach((p, i) => { %>
+    <button
+      onclick="switchTab('<%= p.name %>')"
+      id="tab-<%= p.name %>"
+      class="tab-btn px-4 py-2 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-900 -mb-px <%= i === 0 ? 'active' : '' %>"
+    >
+      <%= p.label %>
+      <% if (p.isCustom) { %>
+        <span class="ml-1.5 inline-block w-2 h-2 rounded-full bg-indigo-500" title="Custom prompt active"></span>
+      <% } %>
+    </button>
+  <% }) %>
+</div>
+
+<!-- Panels -->
+<% prompts.forEach((p, i) => { %>
+  <div id="panel-<%= p.name %>" class="tab-panel <%= i === 0 ? 'active' : '' %>">
+    <div class="bg-white rounded-xl border border-gray-200 p-6">
+
+      <div class="flex items-center justify-between mb-4">
+        <div>
+          <h2 class="font-semibold text-lg"><%= p.label %></h2>
+          <% if (p.isCustom) { %>
+            <span class="text-xs text-indigo-600 font-medium">Custom prompt active</span>
+          <% } else { %>
+            <span class="text-xs text-gray-400">Using default prompt</span>
+          <% } %>
+        </div>
+        <% if (p.isCustom) { %>
+          <form method="POST" action="/settings/prompts/<%= p.name %>/reset" onsubmit="return confirm('Reset to default prompt?')">
+            <button type="submit" class="px-3 py-1.5 text-xs text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50">
+              Reset to default
+            </button>
+          </form>
+        <% } %>
+      </div>
+
+      <form method="POST" action="/settings/prompts/<%= p.name %>">
+        <textarea
+          name="content"
+          rows="20"
+          class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm font-mono focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 resize-y"
+        ><%= p.content %></textarea>
+        <div class="mt-4 flex items-center justify-between">
+          <p class="text-xs text-gray-400">
+            Tip: Test changes in the
+            <a href="https://console.anthropic.com/workbench" target="_blank" class="underline hover:text-gray-600">Anthropic Workbench</a>
+            before saving.
+          </p>
+          <button type="submit" class="px-5 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700">
+            Save Prompt
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+<% }) %>
+
+<script>
+  function switchTab(name) {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('tab-' + name).classList.add('active');
+    document.getElementById('panel-' + name).classList.add('active');
+  }
+
+  // Auto-open the tab that was just saved/reset
+  <% if (saved) { %>switchTab('<%= saved %>');<% } %>
+  <% if (reset) { %>switchTab('<%= reset %>');<% } %>
+</script>
+
+<%- include('partials/foot') %>

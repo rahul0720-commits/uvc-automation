@@ -9,6 +9,7 @@ import generateRouter from './routes/generate.js';
 import reviewRouter from './routes/review.js';
 import publishRouter from './routes/publish.js';
 import authRouter from './routes/auth.js';
+import promptsRouter from './routes/prompts.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const app = express();
@@ -28,6 +29,7 @@ app.use('/episodes', generateRouter);
 app.use('/episodes', reviewRouter);
 app.use('/episodes', publishRouter);
 app.use('/auth', authRouter);
+app.use('/', promptsRouter);
 
 // Error handler
 app.use((err, req, res, next) => {

@@ -58,6 +58,15 @@ db.exec(`
   );
 `);
 
+// Create prompts table for editable prompts
+db.exec(`
+  CREATE TABLE IF NOT EXISTS prompts (
+    name TEXT PRIMARY KEY,
+    content TEXT NOT NULL,
+    updated_at TEXT DEFAULT (datetime('now'))
+  );
+`);
+
 // Migration: Add YouTube columns if they don't exist
 const youtubeMigrations = [
   `ALTER TABLE episodes ADD COLUMN youtube_options TEXT`,

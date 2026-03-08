@@ -3,13 +3,18 @@ import { readFileSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import { config } from '../config.js';
+import db from '../db.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const promptsDir = join(__dirname, '..', 'prompts');
 
 const client = new Anthropic({ apiKey: config.anthropicApiKey });
 
-function loadPrompt(filename) {
+function loadPrompt(name, filename) {
+  // Check DB for a custom prompt first
+  const row = db.prepare('SELECT content FROM prompts WHERE name = ?').get(name);
+  if (row) return row.content;
+  // Fall back to the .txt file
   return readFileSync(join(promptsDir, filename), 'utf-8');
 }
 
@@ -17,7 +22,7 @@ function loadPrompt(filename) {
  * Generate a long-form blog post from transcript
  */
 export async function generateBlogPost(transcript, metadata) {
-  const systemPrompt = loadPrompt('blog-post.txt');
+  const systemPrompt = loadPrompt('blog-post', 'blog-post.txt');
   const response = await client.messages.create({
     model: 'claude-sonnet-4-20250514',
     max_tokens: 4096,
@@ -37,7 +42,7 @@ export async function generateBlogPost(transcript, metadata) {
  * Returns a JSON array of tweet strings
  */
 export async function generateTwitterThread(transcript, metadata) {
-  const systemPrompt = loadPrompt('twitter-thread.txt');
+  const systemPrompt = loadPrompt('twitter-thread', 'twitter-thread.txt');
   const response = await client.messages.create({
     model: 'claude-sonnet-4-20250514',
     max_tokens: 2048,
@@ -71,7 +76,7 @@ export async function generateTwitterThread(transcript, metadata) {
  * Generate a LinkedIn post from transcript
  */
 export async function generateLinkedInPost(transcript, metadata) {
-  const systemPrompt = loadPrompt('linkedin-post.txt');
+  const systemPrompt = loadPrompt('linkedin-post', 'linkedin-post.txt');
   const response = await client.messages.create({
     model: 'claude-sonnet-4-20250514',
     max_tokens: 1024,
@@ -91,7 +96,7 @@ export async function generateLinkedInPost(transcript, metadata) {
  * Returns a JSON object with titles[] and thumbnails[]
  */
 export async function generateYouTubeOptions(transcript, metadata) {
-  const systemPrompt = loadPrompt('youtube-options.txt');
+  const systemPrompt = loadPrompt('youtube-options', 'youtube-options.txt');
   const response = await client.messages.create({
     model: 'claude-sonnet-4-20250514',
     max_tokens: 2048,
